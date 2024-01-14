@@ -3,12 +3,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
-//@desc register user 
+//@desc register user
 //@route /api/register
 const registerUser = asyncHandler( async(req,res) => {
     const {userName,email,password} = req.body;
     if(!userName || !email || !password ){
-        res.status(400);
+        res.status(405);
         throw new Error("All feilds are mandatory");
     }
     const userAvailable = await User.findOne({email});
@@ -17,7 +17,7 @@ const registerUser = asyncHandler( async(req,res) => {
         throw new Error("User already registered");
     }
 
-    //Hash password 
+    //Hash password
     const hashPassword = await bcrypt.hash(password,10);
     const user = await User.create({
         userName,
@@ -25,7 +25,19 @@ const registerUser = asyncHandler( async(req,res) => {
         password:hashPassword
     })
     if(user){
-        res.status(201).json({_id:user.id,email:user.email})
+        const accessToken = jwt.sign({
+            user:{
+                userName:user.userName,
+                email:user.email,
+                id:user.id
+            }
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn:"20m"}
+        );
+
+        res.status(200).json({accessToken});
+        // res.status(201).json({_id:user.id,email:user.email})
     }else{
         res.status(400);
         throw new Error("Something went wrong");
@@ -45,10 +57,10 @@ const loginUser = asyncHandler(async(req,res) => {
     if(!user){
         res.status(400);
         throw new Error("User not found");
-    }   
+    }
     const isMatch = await bcrypt.compare(password,user.password);
     if(!isMatch){
-        res.status(400);
+        res.status(401);
         throw new Error("Invalid password");
     }
     const accessToken = jwt.sign({
@@ -59,7 +71,7 @@ const loginUser = asyncHandler(async(req,res) => {
         }
     },
     process.env.ACCESS_TOKEN_SECRET,
-    {expiresIn:"20m"}
+    {expiresIn:"20d"}
     );
 
     res.status(200).json({accessToken});

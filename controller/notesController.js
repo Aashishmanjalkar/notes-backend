@@ -6,7 +6,7 @@ const Notes = require("../models/notesModel");
 // @route Get /api/notes
 const getNotes = asyncHandler (async(req,res) => {
     const notes = await Notes.find({user_id:req.user.id});
-    res.status(200).json(notes);
+    res.status(200).json({notes});
 });
 
 //@desc get note
