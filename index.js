@@ -15,6 +15,10 @@ app.use("/api/notes",require("./routes/notesRoute"));
 app.use("/api/user",require("./routes/userRoute"));
 app.use(errorHandler);
 
+app.get('/', (req,res) => {
+    res.json("Hello");
+});
+
 app.listen(port,()=>{
     console.log(`Port listening at ${port}`)
 })
