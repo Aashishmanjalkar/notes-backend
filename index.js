@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const env = require("dotenv").config();
-// const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 const connectDB = require("./config/dbConnection");
 const errorHandler = require("./middleware/errorHandler");
 const cors = require('cors');
@@ -19,6 +19,6 @@ app.get('/', (req,res) => {
     res.json("Hello");
 });
 
-// app.listen(port,()=>{
-//     console.log(`Port listening at ${port}`)
-// })
+app.listen(port,()=>{
+    console.log(`Port listening at ${port}`)
+})
